@@ -1,0 +1,52 @@
+# Configuração de Backend do Site <%= @vhost %> Gerenciado Pelo Puppet
+
+backend <%= @title %> {
+  .host = "<%= @host %>";
+  .port = "<%= @port %>";
+  .probe = {
+    .request =
+      "GET / HTTP/1.1"
+      "Host: <%= @vhost %>"
+      "Connection: close";
+    .expected_response = 200;
+    .interval = 1s;
+    .timeout = 30s;
+    .threshold = 3;
+  }
+}
+
+sub vcl_recv {
+  <% if @url %>
+  if (req.http.host ~ "^(.*)<%= @vhost %>$" && req.url ~ "^<%= @url %>$") {
+  <% else %>
+  if (req.http.host ~ "^(.*)<%= @vhost %>$") {
+  <% end %>
+    set req.backend_hint = <%= @title %>;
+    <% if @nocache %><%- @nocache.each  do | nocache_item | %>     
+    if (req.url ~ "^<%= nocache_item %>") {
+      return(pass);  
+    } <% end %> <% end %>
+
+  }
+  
+}
+
+sub vcl_backend_response {
+  <% if @cache %><%- @cache.each do | cache_item | %>
+  if (bereq.http.host ~ "^(.*)<%= @vhost %>$" && bereq.url ~ "<%= cache_item['url'] %>") {
+    set beresp.http.Cache-Control = "<%= cache_item['time'] %>"; 
+    set beresp.ttl = <%= cache_item['time'] + 's' %>;
+  } 
+  <% end %> <% end %>
+}
+
+sub vcl_deliver {
+  if (req.backend_hint == <%= @title %>) {
+    unset resp.http.X-Varnish;
+    unset resp.http.X-Grace;
+    unset resp.http.X-Cache-Hits;
+    unset resp.http.X-Cache;
+    unset resp.http.Server;
+    unset resp.http.Via;
+  }
+}
