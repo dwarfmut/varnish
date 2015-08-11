@@ -1,0 +1,26 @@
+NFILES=<%= @nfiles %>
+MEMLOCK=<%= @memlock %>
+NPROCS=<%= @nprocs %>
+RELOAD_VCL=<%= @reload_vcl %>
+VARNISH_VCL_CONF=/etc/varnish/default.vcl
+VARNISH_LISTEN_PORT=<%= @varnish_ip %>
+VARNISH_ADMIN_LISTEN_ADDRESS=<%= @admin_ip %>
+VARNISH_ADMIN_LISTEN_PORT=<%= @varnish_port %>
+VARNISH_SECRET_FILE=<%= @secret_file %>
+VARNISH_MIN_THREADS=<%= @min_threads %>
+VARNISH_MAX_THREADS=<%= @max_threads %>
+VARNISH_THREAD_TIMEOUT=<%= @thread_timeout %>
+VARNISH_STORAGE_SIZE=<%= @storage_size %>
+VARNISH_STORAGE="<%= @storage_type %>,${VARNISH_STORAGE_SIZE}"
+VARNISH_TTL=120
+DAEMON_OPTS="-a ${VARNISH_LISTEN_ADDRESS}:${VARNISH_LISTEN_PORT} \
+             -f ${VARNISH_VCL_CONF} \
+             -T ${VARNISH_ADMIN_LISTEN_ADDRESS}:${VARNISH_ADMIN_LISTEN_PORT} \
+             -t ${VARNISH_TTL} \
+             -p thread_pool_min=${VARNISH_MIN_THREADS} \
+             -p thread_pool_max=${VARNISH_MAX_THREADS} \
+             -p thread_pool_timeout=${VARNISH_THREAD_TIMEOUT} \
+             -u varnish -g varnish \
+             -S ${VARNISH_SECRET_FILE} \
+             -s ${VARNISH_STORAGE}"
+
