@@ -30,7 +30,6 @@ class varnish (
     ensure => "running",
   }
 
-<<<<<<< HEAD
   package { "haproxy":
     ensure => "latest",
   }
@@ -39,15 +38,18 @@ class varnish (
     ensure => "running",
   }
 
-=======
->>>>>>> 6f06dd33824d29389ecc609ee0ee8de9f2865b71
   file { "/etc/varnish/main.vcl":
     content => template("varnish/main.vcl.erb"),
     owner   => varnish,
     group   => varnish,
   }
 
-<<<<<<< HEAD
+  file { "/etc/haproxy/vhosts":
+    ensure => "directory",
+    owner  => root,
+    group  => root,
+  }
+
   concat { "/etc/haproxy/haproxy.cfg":
     owner => root,
     group => root,
@@ -59,8 +61,6 @@ class varnish (
     order   => 1,
   }
 
-=======
->>>>>>> 6f06dd33824d29389ecc609ee0ee8de9f2865b71
   concat { "/etc/varnish/default.vcl":
     owner => varnish,
     group => varnish,
