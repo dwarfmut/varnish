@@ -21,6 +21,7 @@ sub vcl_recv {
   <% else %>
   if (req.http.host ~ "^(.*)<%= @vhost %>$") {
   <% end %>
+    set req.http.backend = <%= @title %>
     set req.backend_hint = <%= @title %>;
     <% if @nocache %><%- @nocache.each  do | nocache_item | %>     
     if (req.url ~ "^<%= nocache_item %>") {

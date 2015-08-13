@@ -1,0 +1,5 @@
+backend <%= @title %>
+    mode http
+    option httpchk HEAD /index.html HTTP/1.1\r\nHost:\ <%= @vhost %>
+    balance     roundrobin
+    server  elb backends.<%= @title %>.<%= @vhost %>:80 check inter 1000

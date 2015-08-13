@@ -18,10 +18,10 @@ class varnish::params {
   $max_threads        = $::processorcount * 700
   $thread_timeout     = "120"
   
-  if $::memorysize_mb > "10GB" {
+  if $::memorysize_mb > 10 {
     $storage_type = "malloc"
     $storage_size = $::memorysize_mb / 2
-  else 
+  } else { 
     $storage_type = "file"
     $storage_size = $::partitions["sda2"]["size"] / 2
   }

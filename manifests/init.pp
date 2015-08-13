@@ -30,7 +30,43 @@ class varnish (
     ensure => "running",
   }
 
-  class { "::varnish:sysconfig":
+  package { "haproxy":
+    ensure => "latest",
+  }
+
+  service { "haproxy":
+    ensure => "running",
+  }
+
+  file { "/etc/varnish/main.vcl":
+    content => template("varnish/main.vcl.erb"),
+    owner   => varnish,
+    group   => varnish,
+  }
+
+  concat { "/etc/haproxy/haproxy.cfg":
+    owner => root,
+    group => root,
+  }
+
+  concat::fragment { "haproxy":
+    target  => "/etc/haproxy/haproxy.cfg",
+    content => template("varnish/_haproxy.erb"),
+    order   => 1,
+  }
+
+  concat { "/etc/varnish/default.vcl":
+    owner => varnish,
+    group => varnish,
+  }
+
+  concat::fragment { "default":
+    target  => "/etc/varnish/default.vcl",
+    content => "vcl 4.0;\nimport std;\n\ninclude \"/etc/varnish/main.vcl\";\n",
+    order   => 1,
+  }
+
+  varnish::sysconfig { "sysconfig":
     varnish_ip     => $varnish_ip,
     varnish_port   => $varnish_port,
     admin_ip       => $admin_port,
@@ -50,3 +86,4 @@ class varnish (
   }
 
 }
+

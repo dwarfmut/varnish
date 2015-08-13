@@ -8,22 +8,14 @@ define varnish::config (
   $nocache = undef,
 
 ) {
-
-  file { "/etc/varnish/main.vcl":
-    content => template("varnish/main.vcl.erb"),
-    owner   => varnish,
-    group   => varnish,
+  include varnish
+  
+  if $host !~ /\b^([0-9]{1,3}\.){3}[0-9]{1,3}\b/ {
+    fail("Address $host not is IP in $title backend configuration")
   }
 
-  concat { "/etc/varnish/default.vcl":
-    owner => varnish,
-    group => varnish,
-  }
-
-  concat::fragment { "default":
-    target  => "/etc/varnish/default.vcl",
-    content => "vcl 4.0;\nimport std;\n\ninclude \"/etc/varnish/main.vcl\";\n",
-    order   => 1,
+  if $url =~ /^\/$/ {
+    fail("You can not set / in URL config in $title configuration")
   }
 
   concat::fragment { "${title}":
@@ -36,6 +28,11 @@ define varnish::config (
     content => template("varnish/sites.vcl.erb"),
     owner   => root,
     group   => root,
+    notify  => Service["varnishd"],
+  }
+
+  varnish::haproxy { $title:
+    vhost => $vhost,
   }
 
 
