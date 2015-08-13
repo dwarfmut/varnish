@@ -29,11 +29,13 @@ define varnish::config (
     owner   => root,
     group   => root,
     notify  => Service["varnishd"],
+<<<<<<< HEAD
   }
 
   varnish::haproxy { $title:
     vhost => $vhost,
+=======
+>>>>>>> 6f06dd33824d29389ecc609ee0ee8de9f2865b71
   }
-
 
 }
